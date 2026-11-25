@@ -1,0 +1,42 @@
+{{define "content"}}
+<h1>Kelola User</h1>
+
+<div class="card">
+  <h2 style="margin-top:0">Tambah user</h2>
+  <form method="post" action="/admin/users" class="row">
+    <div><label>Username</label><input name="username" pattern="[a-z0-9_]{3,50}" title="huruf kecil, angka, underscore" required></div>
+    <div><label>Nama</label><input name="nama" maxlength="100" required></div>
+    <div><label>Password</label><input name="password" type="password" minlength="6" required></div>
+    <div><label>Peran</label>
+      <select name="role" id="role" onchange="document.getElementById('opdsel').style.display=this.value=='opd'?'':'none'">
+        <option value="opd">OPD</option><option value="walikota">Walikota</option><option value="admin">Admin</option>
+      </select></div>
+    <div id="opdsel"><label>OPD</label>
+      <select name="opd_id">{{range .OPDs}}<option value="{{.ID}}">{{.Nama}}</option>{{end}}</select></div>
+    <div><button class="btn">Tambah</button></div>
+  </form>
+</div>
+
+<table>
+  <tr><th>Username</th><th>Nama</th><th>Peran</th><th>OPD</th><th></th></tr>
+  {{range .Users}}
+  <tr><td>{{.Username}}</td><td>{{.Nama}}</td><td><span class="tag {{if eq .Role "admin"}}berjalan{{else}}selesai{{end}}">{{.Role}}</span></td>
+    <td>{{if .OPD}}{{.OPD}}{{else}}<span class="muted">-</span>{{end}}</td>
+    <td class="num"><a href="/admin/users/{{.ID}}/edit">Edit</a>
+      {{if ne .ID $.User.ID}}
+      <form method="post" action="/admin/users/{{.ID}}/delete" style="display:inline" onsubmit="return confirm('Hapus user {{.Username}}?')">
+        <button class="btn" style="background:#b91c1c;padding:2px 10px">Hapus</button></form>
+      {{end}}</td></tr>
+  {{end}}
+</table>
+
+<h2>OPD</h2>
+<div class="card">
+  <p class="muted" style="margin-top:0">{{range $i, $o := .OPDs}}{{if $i}} &middot; {{end}}{{$o.Kode}} — {{$o.Nama}}{{end}}</p>
+  <form method="post" action="/admin/opd" class="row">
+    <div><label>Kode OPD</label><input name="kode" maxlength="20" required></div>
+    <div style="flex:3"><label>Nama OPD</label><input name="nama" maxlength="120" required></div>
+    <div><button class="btn">Tambah OPD</button></div>
+  </form>
+</div>
+{{end}}

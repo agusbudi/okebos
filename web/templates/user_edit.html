@@ -1,0 +1,21 @@
+{{define "content"}}
+<p><a href="/admin/users">&larr; Kembali</a></p>
+<h1>Edit user: {{.U.Username}}</h1>
+<form method="post" action="/admin/users/{{.U.ID}}" class="card stack" style="max-width:520px">
+  <label>Nama</label><input name="nama" value="{{.U.Nama}}" maxlength="100" required>
+  <label>Peran</label>
+  <select name="role" {{if .Self}}title="Peran akun sendiri tidak bisa diubah"{{end}}
+    onchange="document.getElementById('opdsel').style.display=this.value=='opd'?'':'none'">
+    <option value="opd" {{if eq .U.Role "opd"}}selected{{end}}>OPD</option>
+    <option value="walikota" {{if eq .U.Role "walikota"}}selected{{end}}>Walikota</option>
+    <option value="admin" {{if eq .U.Role "admin"}}selected{{end}}>Admin</option>
+  </select>
+  <div id="opdsel" {{if ne .U.Role "opd"}}style="display:none"{{end}}>
+    <label>OPD</label>
+    <select name="opd_id">{{range .OPDs}}<option value="{{.ID}}" {{if eq .ID $.U.OPDID}}selected{{end}}>{{.Nama}}</option>{{end}}</select>
+  </div>
+  <label>Password baru <span class="muted">(kosongkan bila tidak diganti)</span></label>
+  <input name="password" type="password" minlength="6" autocomplete="new-password">
+  <p><button class="btn">Simpan</button></p>
+</form>
+{{end}}

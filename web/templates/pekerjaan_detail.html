@@ -1,0 +1,40 @@
+{{define "content"}}
+<p><a href="/pekerjaan">&larr; Kembali</a></p>
+<h1>{{.P.Nama}}</h1>
+<p class="muted">{{.P.OPD}} &middot; {{.P.Mulai}} s/d {{.P.Selesai}} &middot; <span class="tag {{.P.Status}}">{{.P.Status}}</span></p>
+
+<div class="grid">
+  <div class="stat"><div class="l">Progres fisik</div><div class="v">{{.P.Persen}}%</div>
+    <div class="bar"><span style="width:{{.P.Persen}}%"></span></div></div>
+  <div class="stat"><div class="l">Nilai kontrak</div><div class="v">{{rupiah .P.Nilai}}</div></div>
+  <div class="stat"><div class="l">Anggaran teralokasi</div><div class="v">{{rupiah .P.Alokasi}}</div>
+    <div class="bar sp"><span style="width:{{min100 .Serapan}}%"></span></div></div>
+</div>
+
+{{if and (eq .User.Role "opd") (eq .P.Status "berjalan")}}
+<div class="card">
+  <h2 style="margin-top:0">Tambah progres</h2>
+  <form method="post" action="/pekerjaan/{{.P.ID}}/progress" class="row">
+    <div><label>Progres (%)</label><input type="number" name="persen" min="{{.P.Persen}}" max="100" value="{{.P.Persen}}" required></div>
+    <div><label>Tanggal</label><input type="date" name="tanggal" value="{{.Today}}" required></div>
+    <div style="flex:2"><label>Keterangan</label><input name="keterangan" maxlength="255"></div>
+    <div><button class="btn">Simpan</button></div>
+  </form>
+  <p class="hint">Progres 100% menandai pekerjaan selesai dan tidak dapat diubah lagi.</p>
+</div>
+{{end}}
+
+<h2>Riwayat progres</h2>
+<table>
+  <tr><th>Tanggal</th><th class="num">Progres</th><th>Keterangan</th><th>Dilaporkan oleh</th></tr>
+  {{range .Progress}}<tr><td>{{.Tanggal}}</td><td class="num">{{.Persen}}%</td><td>{{.Keterangan}}</td><td>{{.Oleh}}</td></tr>
+  {{else}}<tr><td colspan="4" class="muted">Belum ada progres.</td></tr>{{end}}
+</table>
+
+<h2>Alokasi anggaran</h2>
+<table>
+  <tr><th>Sumber cashflow</th><th>Kode rekening</th><th>Tgl cashflow</th><th class="num">Nominal</th></tr>
+  {{range .Alokasi}}<tr><td>{{.Uraian}}</td><td>{{.Kode}}</td><td>{{.Tgl}}</td><td class="num">{{rupiah .Nominal}}</td></tr>
+  {{else}}<tr><td colspan="4" class="muted">Belum ada anggaran yang dialokasikan.</td></tr>{{end}}
+</table>
+{{end}}

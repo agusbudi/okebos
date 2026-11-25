@@ -1,0 +1,17 @@
+{{define "content"}}
+<p><a href="/pekerjaan">&larr; Kembali</a></p>
+<h1>Tambah pekerjaan</h1>
+<form method="post" action="/pekerjaan" class="card stack" style="max-width:560px">
+  {{if eq .User.Role "admin"}}
+  <label>OPD</label>
+  <select name="opd_id" required>{{range .OPDs}}<option value="{{.ID}}">{{.Nama}}</option>{{end}}</select>
+  {{end}}
+  <label>Nama pekerjaan</label><input name="nama" maxlength="200" required>
+  <label>Nilai kontrak (Rp)</label><input class="rupiah" name="nilai" inputmode="numeric" autocomplete="off" placeholder="mis. 1.500.000.000" required>
+  <div class="row">
+    <div><label>Tanggal mulai</label><input type="date" name="tgl_mulai" required></div>
+    <div><label>Tanggal selesai</label><input type="date" name="tgl_selesai" required></div>
+  </div>
+  <p><button class="btn">Simpan</button></p>
+</form>
+{{end}}

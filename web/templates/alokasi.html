@@ -1,0 +1,26 @@
+{{define "content"}}
+<h1>Alokasi anggaran ke pekerjaan</h1>
+
+<form method="post" action="/admin/alokasi" class="card row">
+  <div style="flex:2"><label>Sumber cashflow (saldo tersedia)</label>
+    <select name="cashflow_id" required>
+      <option value="">— pilih —</option>
+      {{range .Cash}}<option value="{{.ID}}">{{.Tanggal}} · {{.Uraian}} · sisa {{rupiah .Saldo}}</option>{{end}}
+    </select></div>
+  <div style="flex:2"><label>Pekerjaan (berjalan)</label>
+    <select name="pekerjaan_id" required>
+      <option value="">— pilih —</option>
+      {{range .Works}}<option value="{{.ID}}">{{.OPD}} · {{.Nama}} (sisa {{rupiah (sisa .Nilai .Alokasi)}})</option>{{end}}
+    </select></div>
+  <div><label>Nominal (Rp)</label><input class="rupiah" name="nominal" inputmode="numeric" autocomplete="off" placeholder="mis. 50.000.000" required></div>
+  <div><button class="btn">Alokasikan</button></div>
+</form>
+{{if not .Cash}}<p class="hint">Belum ada saldo cashflow. Tarik data dulu di menu Data BAPENDA.</p>{{end}}
+
+<h2>Riwayat alokasi</h2>
+<table>
+  <tr><th>OPD</th><th>Pekerjaan</th><th>Sumber</th><th>Waktu</th><th class="num">Nominal</th></tr>
+  {{range .Alokasi}}<tr><td>{{.OPD}}</td><td>{{.Pekerjaan}}</td><td>{{.Uraian}} <span class="muted">({{.Kode}})</span></td><td>{{.Tgl}}</td><td class="num">{{rupiah .Nominal}}</td></tr>
+  {{else}}<tr><td colspan="5" class="muted">Belum ada alokasi.</td></tr>{{end}}
+</table>
+{{end}}

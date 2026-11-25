@@ -1,0 +1,34 @@
+{{define "content"}}
+<div class="toolbar">
+  <h1 style="margin:0">Pekerjaan</h1>
+  {{if or (eq .User.Role "opd") (eq .User.Role "admin")}}<a class="btn" href="/pekerjaan/new">+ Tambah pekerjaan</a>{{end}}
+</div>
+
+<form method="get" class="card row">
+  {{if ne .User.Role "opd"}}
+  <div><label>OPD</label>
+    <select name="opd"><option value="0">Semua OPD</option>
+      {{range .OPDs}}<option value="{{.ID}}" {{if eq .ID $.FilterOPD}}selected{{end}}>{{.Nama}}</option>{{end}}
+    </select></div>
+  {{end}}
+  <div><label>Status</label>
+    <select name="status">
+      <option value="">Semua</option>
+      <option value="berjalan" {{if eq .FilterStatus "berjalan"}}selected{{end}}>Berjalan</option>
+      <option value="selesai" {{if eq .FilterStatus "selesai"}}selected{{end}}>Selesai</option>
+    </select></div>
+  <div><button class="btn">Terapkan</button></div>
+</form>
+
+<table>
+  <tr>{{if ne .User.Role "opd"}}<th>OPD</th>{{end}}<th>Pekerjaan</th><th>Periode</th><th>Status</th><th>Progres</th><th class="num">Nilai kontrak</th><th class="num">Teralokasi</th></tr>
+  {{range .Pekerjaan}}
+  <tr>{{if ne $.User.Role "opd"}}<td>{{.OPD}}</td>{{end}}
+    <td><a href="/pekerjaan/{{.ID}}">{{.Nama}}</a></td>
+    <td class="muted">{{.Mulai}} s/d {{.Selesai}}</td>
+    <td><span class="tag {{.Status}}">{{.Status}}</span></td>
+    <td><div class="bar"><span style="width:{{.Persen}}%"></span></div>{{.Persen}}%</td>
+    <td class="num">{{rupiah .Nilai}}</td><td class="num">{{rupiah .Alokasi}}</td></tr>
+  {{else}}<tr><td colspan="7" class="muted">Tidak ada pekerjaan.</td></tr>{{end}}
+</table>
+{{end}}

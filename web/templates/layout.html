@@ -1,0 +1,31 @@
+{{define "layout"}}<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OKEBOS - Cashflow & Progres Pekerjaan</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+{{if .User}}
+<header class="top">
+  <a class="brand" href="/">OKEBOS</a>
+  <nav>
+    <a href="/">Dashboard</a>
+    <a href="/pekerjaan">Pekerjaan</a>
+    {{if eq .User.Role "admin"}}<a href="/admin/bapenda">Data BAPENDA</a><a href="/admin/alokasi">Alokasi Anggaran</a><a href="/admin/users">Kelola User</a>{{end}}
+  </nav>
+  <form method="post" action="/logout" class="who">
+    <span>{{.User.Nama}} <small>({{.User.Role}})</small></span>
+    <button class="btn ghost">Keluar</button>
+  </form>
+</header>
+{{end}}
+<main>
+  {{if .Msg}}<div class="flash ok">{{.Msg}}</div>{{end}}
+  {{if .Err}}<div class="flash err">{{.Err}}</div>{{end}}
+  {{template "content" .}}
+</main>
+<script src="/static/app.js"></script>
+</body>
+</html>{{end}}

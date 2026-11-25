@@ -1,0 +1,24 @@
+{{define "content"}}
+<div class="toolbar">
+  <h1 style="margin:0">Data Cashflow BAPENDA (simulasi)</h1>
+  <form method="post" action="/admin/bapenda/sync">
+    <button class="btn">Tarik Data BAPENDA</button>
+  </form>
+</div>
+<p class="muted">Tombol memicu penarikan satu batch transaksi realisasi pendapatan dari sistem BAPENDA (simulasi).</p>
+
+<h2>Riwayat penarikan</h2>
+<table>
+  <tr><th>Waktu</th><th>Batch</th><th class="num">Transaksi</th><th>Dipicu oleh</th></tr>
+  {{range .Logs}}<tr><td>{{.Waktu}}</td><td>{{.Batch}}</td><td class="num">{{.Baris}}</td><td>{{.Oleh}}</td></tr>
+  {{else}}<tr><td colspan="4" class="muted">Belum pernah menarik data.</td></tr>{{end}}
+</table>
+
+<h2>Transaksi terbaru (maks. 50)</h2>
+<table>
+  <tr><th>Tanggal</th><th>Kode rekening</th><th>Uraian</th><th>Batch</th><th class="num">Jumlah</th><th class="num">Saldo belum dialokasikan</th></tr>
+  {{range .Cash}}<tr><td>{{.Tanggal}}</td><td>{{.Kode}}</td><td>{{.Uraian}}</td><td class="muted">{{.Batch}}</td>
+    <td class="num">{{rupiah .Jumlah}}</td><td class="num">{{rupiah .Saldo}}</td></tr>
+  {{else}}<tr><td colspan="6" class="muted">Belum ada data.</td></tr>{{end}}
+</table>
+{{end}}

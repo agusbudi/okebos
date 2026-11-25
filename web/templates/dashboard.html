@@ -1,0 +1,57 @@
+{{define "content"}}
+<h1>Dashboard {{if eq .User.Role "opd"}}— Pekerjaan OPD Anda{{else if eq .User.Role "walikota"}}— Semua OPD{{else}}— Manajemen{{end}}</h1>
+
+<div class="grid">
+  <div class="stat"><div class="l">Total pekerjaan</div><div class="v">{{.Total}}</div></div>
+  <div class="stat"><div class="l">Berjalan / Selesai</div><div class="v">{{.Berjalan}} / {{.Selesai}}</div></div>
+  <div class="stat"><div class="l">Rata-rata progres fisik</div><div class="v">{{.Avg}}%</div></div>
+  <div class="stat"><div class="l">Nilai kontrak</div><div class="v">{{rupiah .Nilai}}</div></div>
+  <div class="stat"><div class="l">Anggaran teralokasi</div><div class="v">{{rupiah .Alokasi}}</div></div>
+  <div class="stat"><div class="l">Serapan anggaran</div><div class="v">{{.Serapan}}%</div></div>
+  {{if ne .User.Role "opd"}}
+  <div class="stat"><div class="l">Cashflow BAPENDA</div><div class="v">{{rupiah .Cashflow}}</div></div>
+  <div class="stat"><div class="l">Saldo belum dialokasikan</div><div class="v">{{rupiah .Saldo}}</div></div>
+  {{end}}
+</div>
+
+<div class="card">
+  <h2 style="margin-top:0">Progres fisik vs serapan anggaran (%)</h2>
+  <div class="chartbox"><canvas id="chart"></canvas></div>
+</div>
+
+{{if ne .User.Role "opd"}}
+<h2>Ringkasan per OPD</h2>
+<table>
+  <tr><th>OPD</th><th class="num">Pekerjaan</th><th class="num">Selesai</th><th>Progres rata-rata</th><th>Serapan</th></tr>
+  {{range .PerOPD}}
+  <tr><td>{{.Nama}}</td><td class="num">{{.Jumlah}}</td><td class="num">{{.Selesai}}</td>
+    <td><div class="bar"><span style="width:{{.Avg}}%"></span></div>{{.Avg}}%</td>
+    <td><div class="bar sp"><span style="width:{{min100 .Serapan}}%"></span></div>{{.Serapan}}%</td></tr>
+  {{else}}<tr><td colspan="5" class="muted">Belum ada data.</td></tr>{{end}}
+</table>
+{{end}}
+
+<h2>Daftar pekerjaan</h2>
+<table>
+  <tr>{{if ne .User.Role "opd"}}<th>OPD</th>{{end}}<th>Pekerjaan</th><th>Status</th><th>Progres</th><th>Serapan</th></tr>
+  {{range .Pekerjaan}}
+  <tr>{{if ne $.User.Role "opd"}}<td>{{.OPD}}</td>{{end}}
+    <td><a href="/pekerjaan/{{.ID}}">{{.Nama}}</a></td>
+    <td><span class="tag {{.Status}}">{{.Status}}</span></td>
+    <td><div class="bar"><span style="width:{{.Persen}}%"></span></div>{{.Persen}}%</td>
+    <td><div class="bar sp"><span style="width:{{min100 (pct .Alokasi .Nilai)}}%"></span></div>{{rupiah .Alokasi}} / {{rupiah .Nilai}}</td></tr>
+  {{else}}<tr><td colspan="5" class="muted">Belum ada pekerjaan.</td></tr>{{end}}
+</table>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+const D = {{.Chart}};
+if (window.Chart) new Chart(document.getElementById('chart'), {
+  type: 'bar',
+  data: { labels: D.labels, datasets: [
+    { label: 'Progres fisik (%)', data: D.progress, backgroundColor: '#1d4ed8' },
+    { label: 'Serapan anggaran (%)', data: D.serapan, backgroundColor: '#0d9488' } ] },
+  options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
+});
+</script>
+{{end}}
